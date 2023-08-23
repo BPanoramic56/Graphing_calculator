@@ -30,7 +30,8 @@ public class GraphingCalculator extends JFrame{
             int maxY = d.height - 1;
 
             drawGraph(g, maxX, maxY);
-            calculatePoints(maxX, maxY, 100, (float) 1, g);
+            g.translate(maxX / 2, maxY / 2);
+            calculatePoints(maxX, maxY, 10, (float) 5, g);
         }
 
         public void drawGraph(Graphics g, int maxX, int maxY){
@@ -47,11 +48,11 @@ public class GraphingCalculator extends JFrame{
 
         public void calculatePoints(int maxX, int maxY, int scale, float res, Graphics g){
             ArrayList<Point> yPoints = new ArrayList<Point>();
-            g.translate(maxX / 2, maxY / 2);
             for (double x = -(maxX/2); x < maxX; x+= 0.1/res){
-                System.out.println(x);
-                double y = -(Math.sin(x));
-                Point coordinates = new Point(x * scale, y * scale);
+                double y = -(
+                    Math.sin(x) * 4 + Math.cos(x)
+                );
+                Point coordinates = new Point(x * scale, y * scale * 10);
                 yPoints.add(coordinates);
             }
 
@@ -67,22 +68,30 @@ public class GraphingCalculator extends JFrame{
             else
                 return maxY;
         }
+        
+        public double bigger(double maxX, double maxY){
+            if (maxX > maxY)
+                return maxX;
+            else
+                return maxY;
+        }
+        public double smaller(double maxX, double maxY){
+            if (maxX > maxY)
+                return maxY;
+            else
+                return maxX;
+        }
 
         public void drawResults(ArrayList<Point> yPoints, int maxX, int maxY, float res, Graphics g){
             drawPoints(yPoints, maxX, maxY, res, g);
             drawLines(yPoints, maxX, maxY, res, g);
-            // drawCircles(yPoints);
-            // drawRect(yPoints);
+            drawRect(yPoints, maxX, maxY, res, g);
         }
 
         public void drawPoints(ArrayList<Point> yPoints, int maxX, int maxY, float res, Graphics g){
             for (int i = 0; i < yPoints.size(); i++){
-                // System.out.println("X: " + yPoints.get(i).getX());
-                // System.out.println("Y: " + yPoints.get(i).getY());
-                int circleSize = 6;
+                int circleSize = 10;
                 g.drawArc((int) yPoints.get(i).getX()-(circleSize/2), (int) yPoints.get(i).getY()-(circleSize/2), circleSize, circleSize, 0, 360);
-                // System.out.println("---------------------");
-                // System.out.println(maxY/2);
             }
         }
 
@@ -91,6 +100,33 @@ public class GraphingCalculator extends JFrame{
                 g.drawLine((int) yPoints.get(i-1).getX(), (int) yPoints.get(i-1).getY(), (int) yPoints.get(i).getX(), (int) yPoints.get(i).getY());
             }
         }
+
+        public void drawRect(ArrayList<Point> yPoints, int maxX, int maxY, float res, Graphics g){
+            for (int i = 1; i < yPoints.size(); i++){
+                double pointOneX = yPoints.get(i-1).getX();
+                double pointOneY = yPoints.get(i-1).getY();
+                double pointTwoX = yPoints.get(i).getX();
+                double height = pointOneY;
+                double width = bigger(pointOneX, pointTwoX) - smaller(pointOneX, pointTwoX);
+                if (pointOneY < 0){
+                    height = -height;
+                }
+                else{
+                    height = pointOneY;
+                    pointOneY = 0;
+                }
+                // System.out.println("Height: " + height);
+                // try{
+                //     Thread.sleep(0);
+                // }
+                // catch (Exception InterruptedExectution){
+                //     System.out.println("Interrupted");
+                // }
+                g.drawRect((int) pointOneX, (int) (pointOneY - 1), (int) width, (int) height);
+                // g.drawRect((int) bigger(pointOneY, pointTwoY), (int) pointOneY, (int) width, (int) height);
+            }
+        }
+
     }
 
 }
