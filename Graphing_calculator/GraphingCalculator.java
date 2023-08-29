@@ -23,11 +23,12 @@ public class GraphingCalculator extends JFrame{
             Dimension d = this.getSize();
             this.maxX = d.width - 1;
             this.maxY = d.height - 1;
-            this.res = 100;
-
-            drawGraph(g);
+            this.res = 1;
             g.translate(this.maxX / 2, this.maxY / 2);
+            long start = System.nanoTime();
+            drawGraph(g);
             calculatePoints(20, g);
+            System.out.println("Process Time: " + (System.nanoTime() - start)/1_000_000 + "ms");
         }
 
         public void drawGraph(Graphics g){
@@ -45,39 +46,41 @@ public class GraphingCalculator extends JFrame{
             ArrayList<Point> yPoints = new ArrayList<Point>();
             for (double x = -(this.maxX/2); x < this.maxX; x+= 0.1/this.res){
                 double y = -(
-                    Math.cos(2 * x)/x
+                    Math.tan(Math.sin(x))/x
                 );
-                Point coordinates = new Point(x * scale, y * scale * 10);
-                yPoints.add(coordinates);
+                yPoints.add(new Point(x * scale, y * scale * 10));
             }
             drawResults(yPoints, g);
         }
         
-        public void drawResults(ArrayList<Point> yPoints, Graphics g){
+        public void drawResults(ArrayList<Point> yPoints, Graphics g){   
+            g.setColor(Color.BLACK);   
             drawPoints(yPoints, g);
+            g.setColor(Color.CYAN);
             drawLines(yPoints, g);
+            g.setColor(Color.GRAY);
             drawRect(yPoints, g);
         }
 
         public void drawPoints(ArrayList<Point> yPoints, Graphics g){
-            for (int i = 0; i < yPoints.size(); i++){
+            for (int i = 1; i < yPoints.size(); i++){ 
                 int circleSize = 10;
                 g.drawArc((int) yPoints.get(i).getX()-(circleSize/2), (int) yPoints.get(i).getY()-(circleSize/2), circleSize, circleSize, 0, 360);
             }
         }
 
         public void drawLines(ArrayList<Point> yPoints, Graphics g){
-            for (int i = 1; i < yPoints.size(); i++){
+            for (int i = 1; i < yPoints.size(); i++){ 
                 g.drawLine((int) yPoints.get(i-1).getX(), (int) yPoints.get(i-1).getY(), (int) yPoints.get(i).getX(), (int) yPoints.get(i).getY());
             }
         }
 
         public void drawRect(ArrayList<Point> yPoints, Graphics g){
-            for (int i = 1; i < yPoints.size(); i++){
+            for (int i = 1; i < yPoints.size(); i++){ 
                 double pointOneX = yPoints.get(i-1).getX();
                 double pointOneY = yPoints.get(i-1).getY();
                 double pointTwoX = yPoints.get(i).getX();
-                double height = pointOneY;
+                double height = yPoints.get(i-1).getY();
                 double width = bigger(pointOneX, pointTwoX) - smaller(pointOneX, pointTwoX);
                 if (pointOneY < 0){
                     height = -height;
@@ -89,6 +92,7 @@ public class GraphingCalculator extends JFrame{
                 g.drawRect((int) pointOneX, (int) (pointOneY - 1), (int) width, (int) height);
             }
         }
+
 
         private double bigger(double num1, double num2){
             return num1 >= num2 ? num1 : num2;
