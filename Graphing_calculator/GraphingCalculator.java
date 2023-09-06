@@ -7,13 +7,6 @@ import java.util.ArrayList;
 public class GraphingCalculator extends JFrame{
 
     public GraphingCalculator(int width, int height){
-        GraphInputs input = new GraphInputs();
-        // Point size = input.getInputs();
-        try {
-            Thread.sleep(999999);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(width, height);
         add("Center", new createCanvas());
@@ -24,16 +17,18 @@ public class GraphingCalculator extends JFrame{
         private int maxX;
         private int maxY;
         private double res;
+        private double scale;
 
         public void paint(Graphics g){
             Dimension d = this.getSize();
             this.maxX   = d.width - 1;
             this.maxY   = d.height - 1;
-            this.res    = 0.1;
+            this.res    = 1000;
+            this.scale = 100;
             long start = System.nanoTime();
             drawGraph(g);
             g.translate(this.maxX / 2, this.maxY / 2);
-            calculatePoints(20, g);
+            calculatePoints(g);
             System.out.println("Process Time: " + (System.nanoTime() - start)/1_000_000 + "ms");
         }
 
@@ -48,11 +43,11 @@ public class GraphingCalculator extends JFrame{
                 g.drawArc(midX-i, midY-i, i*2, i*2, 0, 360);
         }
 
-        public void calculatePoints(int scale, Graphics g){
+        public void calculatePoints(Graphics g){
             ArrayList<Point> yPoints = new ArrayList<Point>();
             for (double x = -(this.maxX/2); x < this.maxX; x+= 0.1/this.res){
                 double y = -(
-                    (Math.sin(x) + Math.cos(x)) * Math.sin(x * x)
+                    Math.sin(x) * Math.sin(x/2) * x
                 );
                 yPoints.add(new Point(x * scale, y * scale * 10));
             }
@@ -65,7 +60,7 @@ public class GraphingCalculator extends JFrame{
             g.setColor(Color.RED);
             drawLines(yPoints, g);
             g.setColor(Color.GRAY);
-            drawRect(yPoints, g);
+            // drawRect(yPoints, g);
         }
 
         public void drawPoints(ArrayList<Point> yPoints, Graphics g){
