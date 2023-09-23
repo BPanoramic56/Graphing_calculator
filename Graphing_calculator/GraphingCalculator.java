@@ -8,12 +8,14 @@ public class GraphingCalculator extends JFrame {
 
     private double scale;
     private double res;
+    private boolean[] decision;
     
     public GraphingCalculator(int width, int height, double scale, double res){
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(width, height);
         this.res    = res;
         this.scale  = scale;
+        menu();
         add("Center", new createCanvas());
     }
 
@@ -22,6 +24,28 @@ public class GraphingCalculator extends JFrame {
     }
     public double getScale(){
         return this.scale;
+    }
+    public boolean[] getDecisionArray(){
+        return this .decision;
+    }
+    private void menu(){
+        boolean[] decision = new boolean[3];
+        for (int i = 0; i < decision.length; i++) //starting all array items as true
+            decision[i] = true;
+        Scanner option = new Scanner(System.in);
+        int chosen;
+        while (true){
+            System.out.println("0 - Save and Graph");
+            System.out.println("1 - Draw Points:    \t[" + (decision[0] == true ? "true" : "false") + "]");
+            System.out.println("2 - Draw Lines:     \t[" + (decision[1] == true ? "true" : "false") + "]");
+            System.out.println("3 - Draw Rectangles:\t[" + (decision[2] == true ? "true" : "false") + "]");
+            chosen = option.nextInt();
+            if (chosen == 0)
+                break;
+            decision[chosen - 1] = !decision[chosen-1];
+        }
+        option.close();
+        this.decision = decision;
     }
 
     class createCanvas extends Canvas{
@@ -38,30 +62,12 @@ public class GraphingCalculator extends JFrame {
             this.maxY   = d.height - 1;
             this.res    = getRes();
             this.scale  = getScale();
-            menu();
+            this.decision = getDecisionArray();
             long start = System.nanoTime();
             drawGraph(g);
             g.translate(this.maxX / 2, this.maxY / 2);
             calculatePoints(g);
             System.out.println("Process Time: " + (System.nanoTime() - start)/1_000_000 + "ms");
-        }
-
-        private void menu(){
-            boolean[] decision = new boolean[3];
-            Scanner option = new Scanner(System.in);
-            int chosen;
-            while (true){
-                System.out.println("ENTER - Save and exit");
-                System.out.println("1 - Draw Points:    \t[" + (decision[0] == true ? "true" : "false") + "]");
-                System.out.println("2 - Draw Lines:     \t[" + (decision[1] == true ? "true" : "false") + "]");
-                System.out.println("3 - Draw Rectangles:\t[" + (decision[2] == true ? "true" : "false") + "]");
-                chosen = option.nextInt();
-                if (chosen == 0)
-                    break;
-                decision[chosen - 1] = !decision[chosen-1];
-            }
-            option.close();
-            this.decision = decision;
         }
 
         private void drawGraph(Graphics g){
@@ -79,7 +85,7 @@ public class GraphingCalculator extends JFrame {
             ArrayList<Point> yPoints = new ArrayList<Point>();
             for (double x = -(this.maxX/2); x < this.maxX; x+= 0.1/this.res){
                 double y = -(
-                    Math.sin(Math.cos(x))
+                    Math.pow(x, 3)
                 );
                 yPoints.add(new Point(x * scale, y * scale * 10));
             }
